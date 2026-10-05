@@ -194,10 +194,12 @@ def async_remove_helper_devices(
         is not None
     )
 
-    composite_device_id = None
-    if isinstance(source_device, dr.DeviceEntry):
-        composite_device_id = source_device.composite_device_id
-    elif not source_is_concrete:
+    if source_is_concrete:
+        if isinstance(source_device, dr.DeviceEntry):
+            composite_device_id = source_device.composite_device_id
+        else:
+            composite_device_id = None
+    else:
         composite_device_id = source_device_id
 
     target_device_id = source_device_id if source_is_concrete else None
