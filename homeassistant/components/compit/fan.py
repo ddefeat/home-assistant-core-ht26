@@ -106,7 +106,11 @@ class CompitFan(CoordinatorEntity[CompitDataUpdateCoordinator], FanEntity):
             self.device_id, CompitParameter.VENTILATION_ON_OFF
         )
 
-        return True if value == STATE_ON else False if value == STATE_OFF else None
+        if value == STATE_ON:
+            return True
+        if value == STATE_OFF:
+            return False
+        return None
 
     @override
     async def async_turn_on(
