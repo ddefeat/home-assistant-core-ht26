@@ -293,15 +293,15 @@ class RegistryEntry:
             display_dict["hb"] = True
         if self.has_entity_name:
             display_dict["hn"] = True
-        name = (
-            self.name
-            if self.name is not None
-            else (
-                self.original_name_unprefixed
-                if self.original_name_unprefixed is not None
-                else self.original_name
-            )
-        )
+
+        name = None
+        if self.name is not None:
+            name = self.name
+        elif self.original_name_unprefixed is not None:
+            name = self.original_name_unprefixed
+        else:
+            name = self.original_name
+
         if name is not None:
             display_dict["en"] = name
         if self.domain == "sensor" and (sensor_options := self.options.get("sensor")):
