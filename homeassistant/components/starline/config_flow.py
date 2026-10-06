@@ -27,7 +27,7 @@ from .const import (
 
 
 class StarlineAuthError(Exception):
-    """Raised when the StarLine API returns a faulty resonse, i.e., auth error."""
+    """Raised when the StarLine API returns a faulty response, i.e., auth error."""
 
 
 class StarlineFlowHandler(ConfigFlow, domain=DOMAIN):
