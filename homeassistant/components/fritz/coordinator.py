@@ -79,6 +79,10 @@ class ClassSetupMissing(Exception):
         super().__init__("Function called before Class setup")
 
 
+class FritzBoxMeshTopologyError(Exception):
+    """Raised when no topology is reported."""
+
+
 class UpdateCoordinatorDataType(TypedDict):
     """Update coordinator data type."""
 
@@ -616,7 +620,9 @@ class FritzBoxTools(DataUpdateCoordinator[UpdateCoordinatorDataType]):
                     self.fritz_hosts.get_mesh_topology
                 )
             ) or not isinstance(topology, dict):
-                raise Exception("Mesh supported but empty topology reported")  # noqa: TRY002
+                raise FritzBoxMeshTopologyError(
+                    "Mesh supported but empty topology reported"
+                )
         except FritzActionError:
             self.mesh_role = MeshRoles.SLAVE
             # Avoid duplicating device trackers
