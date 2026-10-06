@@ -469,39 +469,19 @@ class AuthManager:
             )
 
         if token_type is None:
-            if user.system_generated:
-                token_type = models.TOKEN_TYPE_SYSTEM
-            else:
-                token_type = models.TOKEN_TYPE_NORMAL
-
-        if token_type is models.TOKEN_TYPE_NORMAL:
-            expire_at = time.time() + REFRESH_TOKEN_EXPIRATION
-        else:
-            expire_at = None
-
-        if user.system_generated != (token_type == models.TOKEN_TYPE_SYSTEM):
-            raise ValueError(
-                "System generated users can only have system type refresh tokens"
+            token_type = (
+                models.TOKEN_TYPE_SYSTEM
+                if user.system_generated
+                else models.TOKEN_TYPE_NORMAL
             )
 
-        if token_type == models.TOKEN_TYPE_NORMAL and client_id is None:
-            raise ValueError("Client is required to generate a refresh token.")
+        expire_at = (
+            time.time() + REFRESH_TOKEN_EXPIRATION
+            if token_type is models.TOKEN_TYPE_NORMAL
+            else None
+        )
 
-        if (
-            token_type == models.TOKEN_TYPE_LONG_LIVED_ACCESS_TOKEN
-            and client_name is None
-        ):
-            raise ValueError("Client_name is required for long-lived access token")
-
-        if token_type == models.TOKEN_TYPE_LONG_LIVED_ACCESS_TOKEN:
-            for token in user.refresh_tokens.values():
-                if (
-                    token.client_name == client_name
-                    and token.token_type == models.TOKEN_TYPE_LONG_LIVED_ACCESS_TOKEN
-                ):
-                    # Each client_name can only have one
-                    # long_lived_access_token type of refresh token
-                    raise ValueError(f"{client_name} already exists")
+        self._validate_refresh_token_request(user, client_id, client_name, token_type)
 
         return await self._store.async_create_refresh_token(
             user,
@@ -513,6 +493,37 @@ class AuthManager:
             expire_at,
             credential,
         )
+
+    @staticmethod
+    def _validate_refresh_token_request(
+        user: models.User,
+        client_id: str | None,
+        client_name: str | None,
+        token_type: str,
+    ) -> None:
+        """Raise ValueError if the token type does not fit the user or client."""
+        if user.system_generated != (token_type == models.TOKEN_TYPE_SYSTEM):
+            raise ValueError(
+                "System generated users can only have system type refresh tokens"
+            )
+
+        if token_type == models.TOKEN_TYPE_NORMAL and client_id is None:
+            raise ValueError("Client is required to generate a refresh token.")
+
+        if token_type != models.TOKEN_TYPE_LONG_LIVED_ACCESS_TOKEN:
+            return
+
+        if client_name is None:
+            raise ValueError("Client_name is required for long-lived access token")
+
+        # Each client_name can only have one
+        # long_lived_access_token type of refresh token
+        if any(
+            token.client_name == client_name
+            and token.token_type == models.TOKEN_TYPE_LONG_LIVED_ACCESS_TOKEN
+            for token in user.refresh_tokens.values()
+        ):
+            raise ValueError(f"{client_name} already exists")
 
     @callback
     def async_get_refresh_token(self, token_id: str) -> models.RefreshToken | None:
