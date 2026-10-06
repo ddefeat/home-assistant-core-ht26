@@ -24,6 +24,8 @@ from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .const import DOMAIN
 
+UNEXPECTED_EXCEPTION = "Unexpected exception"
+
 _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
@@ -131,7 +133,7 @@ class AirobotConfigFlow(BaseConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
             except Exception:
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception(UNEXPECTED_EXCEPTION)
                 errors["base"] = "unknown"
             else:
                 # Store MAC address in config entry data
@@ -170,7 +172,7 @@ class AirobotConfigFlow(BaseConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
             except Exception:
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception(UNEXPECTED_EXCEPTION)
                 errors["base"] = "unknown"
             else:
                 # Use device ID as unique ID to prevent duplicates
@@ -197,7 +199,7 @@ class AirobotConfigFlow(BaseConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
             except Exception:
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception(UNEXPECTED_EXCEPTION)
                 errors["base"] = "unknown"
             else:
                 # Verify the device ID matches the existing config entry
@@ -246,7 +248,7 @@ class AirobotConfigFlow(BaseConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
             except Exception:
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception(UNEXPECTED_EXCEPTION)
                 errors["base"] = "unknown"
             else:
                 return self.async_update_reload_and_abort(
