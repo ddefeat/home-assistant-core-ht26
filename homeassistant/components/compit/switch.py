@@ -117,7 +117,11 @@ class CompitSwitch(CoordinatorEntity[CompitDataUpdateCoordinator], SwitchEntity)
             self.device_id, CompitParameter(self.entity_description.key)
         )
 
-        return True if value == STATE_ON else False if value == STATE_OFF else None
+        if value == STATE_ON:
+            return True
+        if value == STATE_OFF:
+            return False
+        return None
 
     @override
     async def async_turn_on(self, **kwargs: Any) -> None:
