@@ -952,7 +952,7 @@ async def test_google_config_get_agent_users(
     config = CloudGoogleConfig(
         hass, GACTIONS_SCHEMA({}), "mock-user-id", cloud_prefs, mock_cloud
     )
-    assert config.async_get_agent_users() == ()
+    assert config.async_get_agent_users() == []
     username_mock.assert_not_called()
 
     # We should not call Cloud.username when not connected
@@ -963,7 +963,7 @@ async def test_google_config_get_agent_users(
     config = CloudGoogleConfig(
         hass, GACTIONS_SCHEMA({}), "mock-user-id", cloud_prefs, mock_cloud
     )
-    assert config.async_get_agent_users() == ()
+    assert config.async_get_agent_users() == []
     username_mock.assert_not_called()
 
     # Logged in and connected
@@ -974,5 +974,5 @@ async def test_google_config_get_agent_users(
     config = CloudGoogleConfig(
         hass, GACTIONS_SCHEMA({}), "mock-user-id", cloud_prefs, mock_cloud
     )
-    assert config.async_get_agent_users() == ("blah",)
+    assert config.async_get_agent_users() == ["blah",]
     username_mock.assert_called()
